@@ -26,15 +26,19 @@ const ProductCard = ({ product, onAdd }: ProductCardProps) => {
               <div className="w-6 h-6 border-2 border-gray-300 border-t-black rounded-full animate-spin"></div>
             </div>
           )}
-            <img
-                src={isImageError ? 'https://placehold.co/100x100?text=No+Image&font=roboto' : product.image}
-              alt={product.title}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                isImageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              onLoad={() => setIsImageLoaded(true)}
-              onError={() => setIsImageError(true)}
-            />
+          <img
+            src={
+              isImageError
+                ? 'https://placehold.co/100x100?text=No+Image&font=roboto'
+                : product.image
+            }
+            alt={product.title}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              isImageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            onLoad={() => setIsImageLoaded(true)}
+            onError={() => setIsImageError(true)}
+          />
         </div>
         <div className="ml-3 flex-1 flex flex-col justify-between">
           <div>

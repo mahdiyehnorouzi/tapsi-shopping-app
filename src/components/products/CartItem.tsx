@@ -11,7 +11,7 @@ type CartItemProps = {
 const CartItem = ({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isImageError, setIsImageError] = useState(false);
-  
+
   const { product, quantity } = item;
   const totalPrice = product.price * quantity;
 

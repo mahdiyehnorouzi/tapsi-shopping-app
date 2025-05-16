@@ -1,4 +1,5 @@
-import React, {createContext, useContext, useState, ReactNode, useEffect} from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+
 import { Product, CartContextType, CartItem } from '../types';
 
 const STORAGE_KEY = 'shopping_cart';
@@ -20,13 +21,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY && e.newValue) {
         try {
           const newCart = JSON.parse(e.newValue);
           setCart(newCart);
-        } catch {
-
+        } catch (error) {
+          console.warn('Invalid cart data received from localStorage event');
         }
       }
     };
@@ -36,29 +39,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    const storedCart = localStorage.getItem(STORAGE_KEY);
-    if (storedCart) {
-      try {
-        setCart(JSON.parse(storedCart));
-      } catch (e) {
-        console.error('Invalid cart data in localStorage');
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = (product: Product) => {
-    setCart(currentCart => {
-      const existingItem = currentCart.find(item => item.product.id === product.id);
-      
+    setCart((currentCart) => {
+      const existingItem = currentCart.find((item) => item.product.id === product.id);
+
       if (existingItem) {
-        return currentCart.map(item => 
-          item.product.id === product.id 
-            ? { ...item, quantity: item.quantity + 1 } 
-            : item
+        return currentCart.map((item) =>
+          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       } else {
         return [...currentCart, { product, quantity: 1 }];
@@ -72,17 +62,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    setCart(currentCart => 
-      currentCart.map(item => 
-        item.product.id === productId 
-          ? { ...item, quantity } 
-          : item
-      )
+    setCart((currentCart) =>
+      currentCart.map((item) => (item.product.id === productId ? { ...item, quantity } : item))
     );
   };
 
   const removeProduct = (productId: number) => {
-    setCart(currentCart => currentCart.filter(item => item.product.id !== productId));
+    setCart((currentCart) => currentCart.filter((item) => item.product.id !== productId));
   };
 
   const clearCart = () => {
@@ -94,19 +80,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+    return cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
   };
 
   return (
-    <CartContext.Provider value={{
-      cart,
-      addToCart,
-      updateQuantity,
-      removeProduct,
-      clearCart,
-      getTotalItems,
-      getTotalPrice
-    }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        updateQuantity,
+        removeProduct,
+        clearCart,
+        getTotalItems,
+        getTotalPrice,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
